@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: trustpulse-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - trustpulse-data:/data/db
+    networks:
+      - trustpulse-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: trustpulse-server
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/trustpulse
+      - JWT_SECRET=your_super_secret_jwt_key_change_in_production_min_32_chars
+      - JWT_REFRESH_SECRET=your_refresh_secret_key_change_in_production_min_32_chars
+      - CLIENT_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+    networks:
+      - trustpulse-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: trustpulse-client
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - trustpulse-network
+
+volumes:
+  trustpulse-data:
+
+networks:
+  trustpulse-network:
+    driver: bridge

@@ -1,0 +1,16 @@
+{
+  "short_name": "TrustPULSE",
+  "name": "TrustPULSE X - AI Reputation Intelligence Platform",
+  "description": "Premium full-stack MERN AI-powered company review analytics platform.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#090d16",
+  "background_color": "#090d16"
+}
