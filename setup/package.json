@@ -1,0 +1,26 @@
+{
+  "name": "trustpulse-x",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd ../server && npm install && cd ../client && npm install",
+    "seed": "cd ../server && node utils/seedData.js",
+    "server": "cd ../server && npm run dev",
+    "client": "cd ../client && npm run dev",
+    "check-docker": "docker --version",
+    "start-docker": "start \"\" \"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\"",
+    "start-mongo-service": "net start MongoDB",
+    "get-mongo-path": "sc qc MongoDB",
+    "start-mongod-8.2": "mkdir ..\\data\\db 2>nul & \"C:\\Program Files\\MongoDB\\Server\\8.2\\bin\\mongod.exe\" --dbpath ..\\data\\db",
+    "start-mongod-user": "mkdir ..\\data\\db 2>nul & mongod --dbpath ..\\data\\db",
+    "start-mongod-local": "mkdir ..\\data\\db 2>nul & (\"C:\\Program Files\\MongoDB\\Server\\8.0\\bin\\mongod.exe\" --dbpath ..\\data\\db || \"C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe\" --dbpath ..\\data\\db || \"C:\\Program Files\\MongoDB\\Server\\6.0\\bin\\mongod.exe\" --dbpath ..\\data\\db || \"C:\\Program Files\\MongoDB\\Server\\5.0\\bin\\mongod.exe\" --dbpath ..\\data\\db || \"C:\\Program Files\\MongoDB\\Server\\4.4\\bin\\mongod.exe\" --dbpath ..\\data\\db)",
+    "db:up": "docker-compose up -d mongodb",
+    "db:down": "docker-compose down",
+    "dev": "npx concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

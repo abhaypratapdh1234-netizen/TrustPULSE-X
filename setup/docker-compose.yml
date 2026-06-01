@@ -13,7 +13,7 @@ services:
 
   server:
     build:
-      context: ./server
+      context: ../server
       dockerfile: Dockerfile
     container_name: trustpulse-server
     ports:
@@ -32,7 +32,7 @@ services:
 
   client:
     build:
-      context: ./client
+      context: ../client
       dockerfile: Dockerfile
     container_name: trustpulse-client
     ports:
