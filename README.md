@@ -46,8 +46,10 @@ TrustPULSE X is a production-grade, full-stack company reputation and review ana
 │   ├── models/                 # Mongoose schemas (User, Company, Review)
 │   ├── routes/                 # Express API router definitions
 │   └── utils/                  # Winston logger & mock seed script utilities
+├── docs/                       # Project documentation & templates
+│   ├── .env.example            # Unified environmental template
+│   └── PROJECT_DETAILS.md      # Comprehensive architectural details
 ├── docker-compose.yml          # Container configuration
-└── .env.example                # Unified environmental template
 ```
 
 ---
