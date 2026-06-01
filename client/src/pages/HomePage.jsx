@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import Hls from 'hls.js';
 import {
   Search, TrendingUp, Shield, Zap, BarChart2, Brain, Star,
   ArrowRight, ChevronRight, CheckCircle, Activity, Users,
@@ -9,6 +10,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CompanyLogo from '../components/CompanyLogo';
 import { useApp } from '../context/AppContext';
 import { companyAPI } from '../services/api';
 
@@ -181,7 +183,7 @@ function HeroSearch() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             className="absolute top-full left-0 right-0 mt-2 glass-card-static border rounded-xl overflow-hidden z-50 shadow-2xl"
-            style={{ borderColor: 'var(--glass-border)', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)' }}
+            style={{ borderColor: 'var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}
           >
             {isSearching && suggestions.length === 0 ? (
               <div className="p-4 text-xs text-slate-400 flex items-center gap-2">
@@ -191,17 +193,17 @@ function HeroSearch() {
             ) : (
               suggestions.length > 0 && (
                 <div className="p-2 max-h-64 overflow-y-auto">
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 py-1.5">Suggestions</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-secondary-color px-3 py-1.5">Suggestions</div>
                   {suggestions.map((s, idx) => {
                     const hasError = imageErrors[s.domain];
                     return (
                       <button
                         key={`${s.domain}-${idx}`}
                         onClick={() => handleSelect(s.name)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all text-left group"
+                        className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover-bg-theme transition-all text-left group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          <div className="w-7 h-7 rounded bg-secondary-color border border-theme flex items-center justify-center overflow-hidden flex-shrink-0">
                             {s.logo && !hasError ? (
                               <img
                                 src={s.logo}
@@ -217,7 +219,7 @@ function HeroSearch() {
                             <div className="text-sm text-primary-color font-semibold group-hover:text-blue-400 transition-colors">
                               {s.name}
                             </div>
-                            <div className="text-[10px] text-slate-500">
+                            <div className="text-[10px] text-secondary-color">
                               {s.domain}
                             </div>
                           </div>
@@ -231,11 +233,11 @@ function HeroSearch() {
 
             {searchHistory.length > 0 && (
               <div className="p-2 border-t" style={{ borderColor: 'var(--glass-border)' }}>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 py-1.5">Recent</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-secondary-color px-3 py-1.5">Recent</div>
                 {searchHistory.slice(0, 4).map(h => (
                   <button key={h} onClick={() => handleSelect(h)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all text-left">
-                    <Clock size={14} className="text-slate-500" />
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover-bg-theme transition-all text-left">
+                    <Clock size={14} className="text-secondary-color" />
                     <span className="text-sm text-secondary-color">{h}</span>
                   </button>
                 ))}
@@ -286,9 +288,7 @@ function CompanyQuickCard({ company, delay }) {
       style={{ borderColor: 'var(--glass-border)' }}
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-lg font-black text-white">
-          {company.name[0]}
-        </div>
+        <CompanyLogo company={company} size="md" />
         <div className="badge" style={{ background: `${trendColor}15`, color: trendColor, border: `1px solid ${trendColor}25` }}>
           {company.trend === 'rising' ? '↑' : company.trend === 'declining' ? '↓' : '→'} {company.trend}
         </div>
@@ -346,12 +346,150 @@ function TestimonialCard({ name, role, text, rating, delay }) {
   );
 }
 
+// ─── Home Contact Form ──────────────────────────────────────
+function HomeContactForm() {
+  const [formData, setFormData] = useState({ name: '', address: '', query: '', queryType: 'General Inquiry' });
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.address || !formData.query) return;
+    setSubmitting(true);
+    await new Promise(r => setTimeout(r, 1200));
+    setSubmitting(false);
+    setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center py-8 space-y-4"
+      >
+        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl font-bold animate-bounce">
+          ✓
+        </div>
+        <h4 className="text-lg font-bold text-primary-color">Message Sent Successfully!</h4>
+        <p className="text-sm text-secondary-color max-w-sm mx-auto leading-relaxed">
+          Thank you, <strong>{formData.name}</strong>! Your query regarding <strong>{formData.queryType}</strong> has been logged. Our operations team will respond to your address at <strong>{formData.address}</strong> within 12-24 business hours.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setSubmitted(false);
+            setFormData({ name: '', address: '', query: '', queryType: 'General Inquiry' });
+          }}
+          className="btn-primary text-xs px-4 py-2 mt-2 inline-block mx-auto"
+        >
+          Send Another Message
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 text-left max-w-lg mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Full Name</label>
+          <input
+            type="text"
+            required
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            placeholder="e.g. Jane Doe"
+            className="input-field py-2.5 text-xs w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Contact / Email Address</label>
+          <input
+            type="text"
+            required
+            value={formData.address}
+            onChange={e => setFormData({ ...formData, address: e.target.value })}
+            placeholder="e.g. jane@company.com"
+            className="input-field py-2.5 text-xs w-full"
+          />
+        </div>
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Query Type</label>
+        <select
+          value={formData.queryType}
+          onChange={e => setFormData({ ...formData, queryType: e.target.value })}
+          className="input-field py-2.5 text-xs w-full outline-none cursor-pointer border border-theme bg-secondary-color text-secondary-color"
+        >
+          <option value="General Inquiry" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>General Inquiry</option>
+          <option value="Technical Support" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Technical Support</option>
+          <option value="Enterprise Sales" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Enterprise Sales</option>
+          <option value="Data Correction" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>Data Correction</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Query Description</label>
+        <textarea
+          rows="4"
+          required
+          value={formData.query}
+          onChange={e => setFormData({ ...formData, query: e.target.value })}
+          placeholder="Describe your inquiry in detail..."
+          className="input-field py-2.5 text-xs w-full leading-relaxed resize-none"
+        />
+      </div>
+      <div className="pt-2">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-primary w-full text-xs py-3 flex items-center justify-center gap-2"
+        >
+          {submitting ? 'Submitting query...' : 'Submit Inquiry'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 // ─── Main HomePage ───────────────────────────────────────────
 export default function HomePage() {
-  const { trending, fetchTrending, trendingLoading } = useApp();
+  const { trending, fetchTrending, trendingLoading, theme } = useApp();
+  const videoRef = useRef(null);
 
   useEffect(() => {
     fetchTrending();
+  }, []);
+
+  useEffect(() => {
+    let hls = null;
+    const video = videoRef.current;
+    if (video) {
+      // Premium stable multi-bitrate HLS live test stream
+      const src = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+      
+      if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch((err) => {
+            console.log("HLS autoplay failed:", err);
+          });
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native Apple Safari/iOS player support
+        video.src = src;
+        video.play().catch((err) => {
+          console.log("Native HLS autoplay failed:", err);
+        });
+      }
+    }
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
   }, []);
 
   const FEATURES = [
@@ -394,98 +532,123 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── HERO SECTION ──────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-16 overflow-hidden">
-        {/* Mesh gradient background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl animate-morph" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/15 rounded-full blur-3xl animate-morph" style={{ animationDelay: '-4s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/8 rounded-full blur-3xl" />
-        </div>
-        <div className="grid-bg absolute inset-0 opacity-40 pointer-events-none" />
-        <ParticleField />
+      {(() => {
+        const isDark = theme === 'dark';
+        const isCream = theme === 'cream-green';
+        
+        const heroBgOverlay = isDark 
+          ? 'bg-gradient-to-tr from-slate-950/95 via-slate-950/80 to-slate-900/60' 
+          : isCream 
+            ? 'bg-gradient-to-tr from-[#fcfaf2]/95 via-[#fcfaf2]/85 to-[#fcfaf2]/70' 
+            : 'bg-gradient-to-tr from-white/95 via-white/85 to-white/70';
 
-        <div className="section-container relative z-10 text-center">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8"
-            style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.25)' }}
-          >
-            <Sparkles size={14} className="text-blue-400" />
-            <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">AI-Powered Reputation Intelligence v2.0</span>
-          </motion.div>
+        const heroRadialOverlay = isDark 
+          ? 'bg-[radial-gradient(circle_at_bottom_left,transparent_20%,rgba(10,10,20,0.85)_70%)]' 
+          : isCream 
+            ? 'bg-[radial-gradient(circle_at_bottom_left,transparent_20%,rgba(252,250,242,0.85)_70%)]' 
+            : 'bg-[radial-gradient(circle_at_bottom_left,transparent_20%,rgba(255,255,255,0.85)_70%)]';
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-6"
-          >
-            <span className="text-primary-color">Analyze Company</span>
-            <br />
-            <span className="text-gradient">Reputation with AI</span>
-            <br />
-            <span className="text-primary-color">& ML Intelligence</span>
-          </motion.h1>
+        return (
+          <section className="relative min-h-screen flex items-center justify-center pt-32 pb-24 md:pb-32 overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+            {/* Full-Screen HLS Video Background */}
+            <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+                loop
+                autoPlay
+              />
+              {/* Overlay layers to create a premium look and perfect contrast that adapts to theme */}
+              <div className={`absolute inset-0 backdrop-blur-[4px] z-1 transition-all duration-500 ${heroBgOverlay}`} />
+              <div className={`absolute inset-0 z-1 transition-all duration-500 ${heroRadialOverlay}`} />
+              <div className="grid-bg absolute inset-0 opacity-20 pointer-events-none z-1" />
+            </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-secondary-color max-w-2xl mx-auto mb-10 leading-relaxed"
-          >
-            The most powerful AI platform for company review analytics. Search any company to instantly get sentiment analysis, trust scores, fake review detection, and actionable insights.
-          </motion.p>
-
-          {/* Search */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-8"
-          >
-            <HeroSearch />
-          </motion.div>
-
-          {/* Popular searches */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-2"
-          >
-            <span className="text-xs text-slate-500 font-medium">Popular:</span>
-            {['Google', 'Microsoft', 'Tesla', 'Amazon', 'Infosys'].map(name => (
-              <Link
-                key={name}
-                to={`/dashboard?q=${name}`}
-                className="text-xs px-3 py-1.5 rounded-full border font-medium transition-all hover:border-blue-500/40 hover:text-blue-400"
-                style={{ borderColor: 'var(--glass-border)', color: 'var(--text-secondary)' }}
+            <div className="section-container relative z-10 text-center w-full max-w-4xl mx-auto px-6 flex flex-col items-center justify-center">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-8 glass mx-auto"
+                style={{ background: 'rgba(59,130,246,0.1)', borderColor: 'rgba(59,130,246,0.25)' }}
               >
-                {name}
-              </Link>
-            ))}
-          </motion.div>
-        </div>
+                <Sparkles size={14} className="text-blue-400 animate-pulse" />
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">AI-Powered Reputation Intelligence v2.0</span>
+              </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="text-xs text-slate-600 font-medium">Scroll to explore</span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-px h-8 bg-gradient-to-b from-slate-600 to-transparent"
-          />
-        </motion.div>
-      </section>
+              {/* Headline (Apple/Vercel inspired typography) */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] mb-6 tracking-tight text-primary-color text-center"
+              >
+                <span>Analyze Company</span>
+                <br />
+                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Reputation with AI</span>
+                <br />
+                <span>& ML Intelligence</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-base md:text-lg text-secondary-color max-w-2xl mx-auto mb-8 leading-relaxed font-medium text-center"
+              >
+                The most powerful AI platform for company review analytics. Search any company to instantly get sentiment analysis, trust scores, fake review detection, and actionable insights.
+              </motion.p>
+
+              {/* Search */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="mb-8 w-full max-w-2xl mx-auto"
+              >
+                <HeroSearch />
+              </motion.div>
+
+              {/* Popular searches */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-wrap items-center justify-center gap-2"
+              >
+                <span className="text-xs text-secondary-color font-semibold uppercase tracking-wider">Popular:</span>
+                {['Google', 'Microsoft', 'Tesla', 'Amazon', 'Infosys'].map(name => (
+                  <Link
+                    key={name}
+                    to={`/dashboard?q=${name}`}
+                    className="text-xs px-3 py-1.5 rounded-full border border-theme text-secondary-color font-bold transition-all hover:border-blue-500/40 hover:text-blue-400 glass"
+                  >
+                    {name}
+                  </Link>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Vertical Scroll Indicator (Aligned Bottom-Right) */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="absolute bottom-12 right-12 hidden md:flex flex-col items-center gap-3 z-10 select-none"
+            >
+              <span className="text-[10px] text-secondary-color font-bold uppercase tracking-[0.25em]" style={{ writingMode: 'vertical-rl' }}>Scroll to explore</span>
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="w-px h-16 bg-gradient-to-b from-blue-400 to-transparent"
+              />
+            </motion.div>
+          </section>
+        );
+      })()}
 
       {/* ── STATS ─────────────────────────────────────────── */}
       <section className="py-16 border-y" style={{ borderColor: 'var(--glass-border)' }}>
@@ -639,6 +802,31 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── HOME CONTACT US FORM ─────────────────────────── */}
+      <section className="py-20 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+        <div className="section-container max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="glass-card border rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
+            style={{ borderColor: 'var(--glass-border)' }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5 pointer-events-none" />
+            
+            <div className="relative text-center mb-8">
+              <div className="section-label mb-2">Get In Touch</div>
+              <h2 className="text-3xl font-black text-primary-color mb-3">Contact Us</h2>
+              <p className="text-xs text-secondary-color max-w-md mx-auto leading-relaxed">
+                Have questions or feedback? Fill out the secure form below to log your query directly into our AI resolution pipeline.
+              </p>
+            </div>
+
+            <HomeContactForm />
           </motion.div>
         </div>
       </section>

@@ -12,19 +12,9 @@ import { useApp } from '../context/AppContext';
 import BrandLogo from './BrandLogo';
 
 const THEMES = [
-  { id: 'dark', label: 'Dark', icon: Moon },
-  { id: 'light', label: 'Light', icon: Sun },
-  { id: 'cyberpunk', label: 'Cyberpunk', icon: Cpu },
-  { id: 'midnight', label: 'Midnight', icon: Monitor },
-  { id: 'purple', label: 'Purple Neon', icon: Zap },
-  { id: 'abyss', label: 'Abyss', icon: Anchor },
-  { id: 'dracula', label: 'Dracula', icon: Ghost },
-  { id: 'monokai', label: 'Monokai', icon: Terminal },
-  { id: 'solarized-dark', label: 'Solarized Dark', icon: Compass },
-  { id: 'solarized-light', label: 'Solarized Light', icon: Feather },
-  { id: 'quiet-light', label: 'Quiet Light', icon: Sparkles },
-  { id: 'tokyo-night-light', label: 'Tokyo Night Light', icon: Palette },
-  { id: 'minimal', label: 'Minimal White', icon: Layers },
+  { id: 'light', label: 'Plain White', icon: Sun },
+  { id: 'cream-green', label: 'Cream & Green', icon: Palette },
+  { id: 'dark', label: 'Dark Mode', icon: Moon },
 ];
 
 const NavLink = ({ to, icon: Icon, label, active }) => (
@@ -33,7 +23,7 @@ const NavLink = ({ to, icon: Icon, label, active }) => (
     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
       active
         ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
-        : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+        : 'text-secondary-color hover:text-primary-color hover-bg-theme'
     }`}
   >
     <Icon size={15} />
@@ -52,6 +42,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -76,12 +67,15 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? 'glass-card-static border-b shadow-lg'
-            : 'bg-transparent border-b border-transparent'
-        }`}
-        style={{ borderRadius: 0, backdropFilter: scrolled ? 'blur(20px)' : 'none' }}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b"
+        style={{
+          borderRadius: 0,
+          backdropFilter: scrolled ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
+          background: scrolled ? 'var(--glass-bg)' : 'transparent',
+          borderColor: scrolled ? 'var(--glass-border)' : 'transparent',
+          boxShadow: scrolled ? 'var(--shadow-card)' : 'none',
+        }}
       >
         <div className="section-container">
           <div className="flex items-center justify-between h-16">
@@ -133,7 +127,7 @@ export default function Navbar() {
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                               theme === t.id
                                 ? 'bg-blue-500/20 text-blue-400'
-                                : 'text-secondary-color hover:bg-white/5 hover:text-primary-color'
+                                : 'text-secondary-color hover-bg-theme hover:text-primary-color'
                             }`}
                           >
                             <TIcon size={14} />
@@ -181,7 +175,7 @@ export default function Navbar() {
                           <p className="text-xs text-secondary-color truncate">{user?.email}</p>
                         </div>
                         <Link to="/profile" onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-secondary-color hover:bg-white/5 hover:text-primary-color transition-all">
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-secondary-color hover-bg-theme hover:text-primary-color transition-all">
                           <User size={14} /> My Account
                         </Link>
                         <button
@@ -233,7 +227,7 @@ export default function Navbar() {
                     key={link.to}
                     to={link.to}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                      isActive(link.to) ? 'bg-blue-500/15 text-blue-400' : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                      isActive(link.to) ? 'bg-blue-500/15 text-blue-400' : 'text-secondary-color hover:text-primary-color hover-bg-theme'
                     }`}
                   >
                     <link.icon size={16} />

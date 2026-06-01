@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   User, Mail, Calendar, Shield, Bookmark, Trash2,
@@ -9,17 +9,32 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
-import { userAPI } from '../services/api';
+import CompanyLogo from '../components/CompanyLogo';
+import { userAPI, authAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
   const { user, logout, updateUser } = useAuth();
   const { watchlist, removeFromWatchlist, searchHistory, setSearchHistory } = useApp();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  // Password reset form state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['profile', 'watchlist', 'history', 'security'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -67,6 +82,37 @@ export default function ProfilePage() {
     setSearchHistory([]);
     localStorage.removeItem('tp_history');
     toast.success('Search history cleared');
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('All password fields are required ⚠️');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match ⚠️');
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long ⚠️');
+      return;
+    }
+
+    setUpdatingPassword(true);
+    try {
+      const response = await authAPI.updatePassword({ currentPassword, newPassword });
+      if (response.data.success) {
+        toast.success('Password updated successfully! 🔒');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update password. Verify your current password.');
+    } finally {
+      setUpdatingPassword(false);
+    }
   };
 
   return (
@@ -123,6 +169,7 @@ export default function ProfilePage() {
                 { id: 'profile', label: 'User Account Info', icon: User },
                 { id: 'watchlist', label: 'Starred Watchlist', icon: Bookmark },
                 { id: 'history', label: 'Audits & History', icon: Settings },
+                { id: 'security', label: 'Reset Password', icon: Key },
               ].map(tab => {
                 const Icon = tab.icon;
                 return (
@@ -130,7 +177,7 @@ export default function ProfilePage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-                      activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg' : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                      activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg' : 'text-secondary-color hover:text-primary-color hover-bg-theme'
                     }`}
                   >
                     <Icon size={16} /> {tab.label}
@@ -184,14 +231,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl border border-blue-500/10 bg-blue-500/5 mt-8">
-                  <h4 className="text-sm font-bold text-primary-color mb-1 flex items-center gap-2">
-                    <Key size={14} className="text-blue-400" /> API Access Keys
-                  </h4>
-                  <p className="text-xs text-secondary-color leading-relaxed">
-                    Premium access keys are enabled for automatic sentiment aggregation. Keep your credentials private to prevent API threshold limit overruns.
-                  </p>
-                </div>
+
               </motion.div>
             )}
 
@@ -231,9 +271,7 @@ export default function ProfilePage() {
                             onClick={() => navigate(`/dashboard?q=${encodeURIComponent(name)}`)}
                             className="flex items-center gap-3 cursor-pointer group"
                           >
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-sm font-black text-white">
-                              {name[0]}
-                            </div>
+                            <CompanyLogo company={{ name }} size="sm" />
                             <div>
                               <h4 className="text-sm font-bold text-primary-color group-hover:text-blue-400 transition-colors flex items-center gap-1.5">
                                 {name} <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -289,19 +327,98 @@ export default function ProfilePage() {
                         <div
                           key={i}
                           onClick={() => navigate(`/dashboard?q=${encodeURIComponent(query)}`)}
-                          className="glass-card-static border rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-all"
+                          className="glass-card-static border rounded-xl p-3 flex items-center justify-between cursor-pointer hover-bg-theme transition-all"
                           style={{ borderColor: 'var(--glass-border)' }}
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-muted-color font-bold"># {i + 1}</span>
                             <span className="text-sm font-bold text-primary-color">{query}</span>
                           </div>
-                          <ArrowRight size={14} className="text-slate-400" />
+                          <ArrowRight size={14} className="text-secondary-color" />
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'security' && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass-card border rounded-2xl p-6 md:p-8 space-y-6 relative overflow-hidden"
+                style={{ borderColor: 'var(--glass-border)' }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
+
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-black text-primary-color flex items-center gap-2.5">
+                      <Key className="text-blue-400" size={24} /> Reset Password
+                    </h2>
+                    <p className="text-xs text-secondary-color mt-1">
+                      Update your account security keys below to safeguard your access.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePasswordReset} className="space-y-4 pt-4 border-t max-w-md" style={{ borderColor: 'var(--glass-border)' }}>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Current Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={currentPassword}
+                      onChange={e => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="input-field py-2.5 text-xs w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">New Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="input-field py-2.5 text-xs w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Confirm New Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="input-field py-2.5 text-xs w-full"
+                    />
+                  </div>
+
+                  <div className="pt-3">
+                    <button
+                      type="submit"
+                      disabled={updatingPassword}
+                      className="btn-primary text-xs py-3 px-6 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/10"
+                    >
+                      {updatingPassword ? (
+                        <>
+                          <RefreshCw className="animate-spin" size={14} /> Updating Keys...
+                        </>
+                      ) : (
+                        <>
+                          Save New Password <ArrowRight size={14} />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
               </motion.div>
             )}
           </div>

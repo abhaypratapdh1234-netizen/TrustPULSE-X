@@ -12,6 +12,7 @@ import Footer from '../components/Footer';
 import SentimentChart from '../components/charts/SentimentChart';
 import PlatformBarChart from '../components/charts/PlatformBarChart';
 import RatingDistributionChart from '../components/charts/RatingDistributionChart';
+import CompanyLogo from '../components/CompanyLogo';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -29,7 +30,7 @@ function TrustGauge({ score }) {
     <div className="flex flex-col items-center">
       <div className="relative w-36 h-36">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 140 140">
-          <circle cx="70" cy="70" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+          <circle cx="70" cy="70" r={radius} fill="none" stroke="var(--border-color)" strokeWidth="10" />
           <motion.circle
             cx="70" cy="70" r={radius} fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" strokeDasharray={circumference}
             initial={{ strokeDashoffset: circumference }}
@@ -55,7 +56,7 @@ function MetricBar({ label, value, maxValue = 5, color = '#3b82f6' }) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs text-secondary-color w-28 font-medium truncate">{label}</span>
-      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border-color)' }}>
         <motion.div
           className="h-full rounded-full"
           style={{ background: color }}
@@ -260,9 +261,7 @@ export default function CompanyPage() {
         <div className="glass-card border rounded-2xl p-6 md:p-8 mb-8" style={{ borderColor: 'var(--glass-border)' }}>
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="flex items-start gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-4xl font-black text-primary-color flex-shrink-0">
-                {company.name[0]}
-              </div>
+              <CompanyLogo company={company} size="xl" />
               <div>
                 <div className="flex items-center gap-3 flex-wrap mb-1">
                   <h1 className="text-3xl md:text-4xl font-black text-primary-color">{company.name}</h1>
@@ -452,7 +451,7 @@ export default function CompanyPage() {
 
             <div className="flex items-center gap-3 flex-wrap">
               {/* Platform Selector */}
-              <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--glass-border)' }}>
+              <div className="flex gap-1 p-1 rounded-lg border border-theme bg-secondary-color">
                 {platforms.map(p => (
                   <button key={p} onClick={() => setPlatformFilter(p)}
                     className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
@@ -465,8 +464,7 @@ export default function CompanyPage() {
 
               {/* Sorting */}
               <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-                className="text-xs font-bold px-3 py-2 rounded-lg outline-none cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}>
+                className="text-xs font-bold px-3 py-2 rounded-lg outline-none cursor-pointer border border-theme bg-secondary-color text-secondary-color">
                 <option value="date_desc">Newest First</option>
                 <option value="date_asc">Oldest First</option>
                 <option value="rating_desc">Highest Rating</option>

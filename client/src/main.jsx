@@ -10,8 +10,13 @@ import { AppProvider } from './context/AppContext'
 import './index.css'
 
 // Apply saved theme immediately to prevent flash
-const savedTheme = localStorage.getItem('trustpulse-theme') || 'dark'
+const savedTheme = localStorage.getItem('tp_theme') || localStorage.getItem('trustpulse-theme') || 'dark'
 document.documentElement.setAttribute('data-theme', savedTheme)
+if (savedTheme === 'dark') {
+  document.documentElement.classList.add('dark')
+} else {
+  document.documentElement.classList.remove('dark')
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

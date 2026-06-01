@@ -9,6 +9,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import RadarComparisonChart from '../components/charts/RadarComparisonChart';
+import CompanyLogo from '../components/CompanyLogo';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -304,8 +305,8 @@ export default function ComparePage() {
             {compareCompanies.length > 0 && (
               <button
                 onClick={clearAllCompanies}
-                className="text-xs font-semibold px-4 py-2 border rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-2"
-                style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}
+                className="text-xs font-semibold px-4 py-2 border rounded-lg transition-all flex items-center gap-2 text-secondary-color hover:text-primary-color"
+                style={{ borderColor: 'var(--glass-border)', background: 'var(--bg-card)' }}
               >
                 Clear Comparison
               </button>
@@ -364,15 +365,15 @@ export default function ComparePage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   className="absolute top-full left-0 right-0 mt-2 glass-card-static border rounded-xl overflow-hidden shadow-2xl z-50"
-                  style={{ borderColor: 'var(--glass-border)', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)' }}
+                  style={{ borderColor: 'var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}
                 >
                   {isSearching && searchResults.length === 0 ? (
-                    <div className="p-4 text-xs text-slate-400 flex items-center gap-2">
+                    <div className="p-4 text-xs text-secondary-color flex items-center gap-2">
                       <RefreshCw size={12} className="animate-spin text-blue-400" />
                       <span>Searching suggestions...</span>
                     </div>
                   ) : searchResults.length === 0 ? (
-                    <div className="p-4 text-slate-500 text-xs italic">No matching companies found.</div>
+                    <div className="p-4 text-secondary-color text-xs italic">No matching companies found.</div>
                   ) : (
                     searchResults.map((company, idx) => {
                       const hasError = imageErrors[company.domain];
@@ -380,13 +381,13 @@ export default function ComparePage() {
                         <button
                           key={`${company.domain}-${idx}`}
                           onClick={() => addCompanyToCompare(company.name)}
-                          className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-white/5 text-left transition-all group"
+                          className="w-full flex items-center justify-between px-4 py-2.5 hover-bg-theme text-left transition-all group"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <div className="w-6 h-6 rounded bg-secondary-color border border-theme flex items-center justify-center overflow-hidden flex-shrink-0">
                               {company.logo && !hasError ? (
                                 <img
-                                  src={company.logo}
+                                  src={company.logo && company.logo.includes('clearbit.com') ? `https://logos.hunter.io/${company.domain}` : company.logo}
                                   alt={company.name}
                                   className="w-4 h-4 object-contain"
                                   onError={() => setImageErrors(prev => ({ ...prev, [company.domain]: true }))}
@@ -399,7 +400,7 @@ export default function ComparePage() {
                               <div className="text-xs font-bold text-primary-color group-hover:text-blue-400 transition-colors">
                                 {company.name}
                               </div>
-                              <div className="text-[9px] text-slate-500">{company.domain}</div>
+                              <div className="text-[9px] text-secondary-color">{company.domain}</div>
                             </div>
                           </div>
                         </button>
@@ -418,8 +419,7 @@ export default function ComparePage() {
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value)}
-                className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}
+                className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer border border-theme bg-secondary-color text-secondary-color"
               >
                 <option value="name">Alphabetical</option>
                 <option value="rating">Overall Rating</option>
@@ -481,9 +481,7 @@ export default function ComparePage() {
                     </button>
 
                     <div>
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-xl font-black text-white mb-4">
-                        {c.name[0]}
-                      </div>
+                      <CompanyLogo company={c} size="md" className="mb-4" />
                       <h3 className="text-lg font-black text-primary-color mb-1 truncate pr-6">{c.name}</h3>
                       <p className="text-[10px] text-muted-color mb-4">{c.industry}</p>
 
@@ -521,7 +519,7 @@ export default function ComparePage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Radar Comparison Chart */}
                 <div className="glass-card border rounded-2xl p-6" style={{ borderColor: 'var(--glass-border)' }}>
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-secondary-color mb-6 flex items-center gap-2">
                     <Shield size={14} className="text-blue-400" /> Metric Distribution Overlap
                   </h3>
                   <RadarComparisonChart companies={sortedCompanies} />
@@ -551,8 +549,8 @@ export default function ComparePage() {
                     ) : (
                       <>
                         {/* Header */}
-                        <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-                          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        <div className="flex items-center justify-between mb-4 border-b border-theme pb-3">
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-secondary-color flex items-center gap-2">
                             <Brain size={14} className="text-purple-400" /> AI Intelligence Briefing
                           </h3>
                           <span className="badge badge-purple text-[9px] font-bold">LIVE RE Reputation Synthesis</span>
@@ -562,31 +560,31 @@ export default function ComparePage() {
                         {overallChampion && (
                           <div className="mb-4 p-4 rounded-xl border relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                             style={{
-                              borderColor: 'rgba(245, 158, 11, 0.25)',
-                              background: 'linear-gradient(135deg, rgba(245,158,11,0.08), rgba(139,92,246,0.05))',
-                              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)'
+                              borderColor: 'rgba(245, 158, 11, 0.35)',
+                              background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(139,92,246,0.04))',
+                              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                             }}
                           >
                             <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none" />
                             
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0 animate-pulse">
+                              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0 animate-pulse">
                                 <Trophy size={18} />
                               </div>
                               <div>
-                                <div className="text-[9px] font-extrabold uppercase tracking-wider text-amber-400 mb-0.5">Overall Workplace Champion</div>
+                                <div className="text-[9px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-0.5">Overall Workplace Champion</div>
                                 <h4 className="text-sm font-black text-primary-color">{overallChampion.name}</h4>
                               </div>
                             </div>
 
                             <div className="flex gap-2">
-                              <div className="px-2.5 py-1 rounded bg-black/40 border border-white/5 text-center">
-                                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Trust Index</div>
-                                <div className="text-xs font-black text-blue-400">TS {overallChampion.trustScore || 0}</div>
+                              <div className="px-2.5 py-1 rounded bg-slate-100 dark:bg-black/40 border border-slate-200/50 dark:border-white/5 text-center">
+                                <div className="text-[8px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Trust Index</div>
+                                <div className="text-xs font-black text-blue-600 dark:text-blue-400">TS {overallChampion.trustScore || 0}</div>
                               </div>
-                              <div className="px-2.5 py-1 rounded bg-black/40 border border-white/5 text-center">
-                                <div className="text-[8px] font-semibold text-slate-500 uppercase tracking-widest">Aggregate Rating</div>
-                                <div className="text-xs font-black text-amber-400">★ {(overallChampion.overallRating || 0).toFixed(1)}</div>
+                              <div className="px-2.5 py-1 rounded bg-slate-100 dark:bg-black/40 border border-slate-200/50 dark:border-white/5 text-center">
+                                <div className="text-[8px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Aggregate Rating</div>
+                                <div className="text-xs font-black text-amber-600 dark:text-amber-400">★ {(overallChampion.overallRating || 0).toFixed(1)}</div>
                               </div>
                             </div>
                           </div>
@@ -596,88 +594,88 @@ export default function ComparePage() {
                         <div className="grid grid-cols-2 gap-3 mb-4">
                           {/* Work-Life Balance Leader */}
                           {wlbWinner && (
-                            <div className="p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/10 flex items-center justify-center text-blue-400 flex-shrink-0">
+                            <div className="p-3 rounded-xl border border-slate-200/60 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/10 flex items-center justify-center text-blue-500 dark:text-blue-400 flex-shrink-0">
                                 <Scale size={12} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider truncate">WLB Standard</div>
+                                <div className="text-[8px] font-extrabold text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">WLB Standard</div>
                                 <div className="text-xs font-black text-primary-color truncate">{wlbWinner.name}</div>
-                                <div className="text-[9px] font-bold text-blue-400">{(wlbWinner.workLifeBalance || wlbWinner.ratings?.workLifeBalance || 0).toFixed(1)} ★</div>
+                                <div className="text-[9px] font-bold text-blue-600 dark:text-blue-400">{(wlbWinner.workLifeBalance || wlbWinner.ratings?.workLifeBalance || 0).toFixed(1)} ★</div>
                               </div>
                             </div>
                           )}
 
                           {/* Salary & Benefits Leader */}
                           {salaryWinner && (
-                            <div className="p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                            <div className="p-3 rounded-xl border border-slate-200/60 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center text-emerald-500 dark:text-emerald-400 flex-shrink-0">
                                 <Coins size={12} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider truncate">Comp & Perks</div>
+                                <div className="text-[8px] font-extrabold text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">Comp & Perks</div>
                                 <div className="text-xs font-black text-primary-color truncate">{salaryWinner.name}</div>
-                                <div className="text-[9px] font-bold text-emerald-400">{(salaryWinner.salaryBenefits || salaryWinner.ratings?.salaryBenefits || 0).toFixed(1)} ★</div>
+                                <div className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">{(salaryWinner.salaryBenefits || salaryWinner.ratings?.salaryBenefits || 0).toFixed(1)} ★</div>
                               </div>
                             </div>
                           )}
 
                           {/* Culture Leader */}
                           {cultureWinner && (
-                            <div className="p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/10 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                            <div className="p-3 rounded-xl border border-slate-200/60 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/10 flex items-center justify-center text-cyan-500 dark:text-cyan-400 flex-shrink-0">
                                 <Users size={12} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider truncate">Work Culture</div>
+                                <div className="text-[8px] font-extrabold text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">Work Culture</div>
                                 <div className="text-xs font-black text-primary-color truncate">{cultureWinner.name}</div>
-                                <div className="text-[9px] font-bold text-cyan-400">{(cultureWinner.culture || cultureWinner.ratings?.culture || 0).toFixed(1)} ★</div>
+                                <div className="text-[9px] font-bold text-cyan-600 dark:text-cyan-400">{(cultureWinner.culture || cultureWinner.ratings?.culture || 0).toFixed(1)} ★</div>
                               </div>
                             </div>
                           )}
 
                           {/* Career Growth Leader */}
                           {growthWinner && (
-                            <div className="p-3 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0">
+                            <div className="p-3 rounded-xl border border-slate-200/60 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.04] transition-all flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/10 flex items-center justify-center text-purple-500 dark:text-purple-400 flex-shrink-0">
                                 <TrendingUp size={12} />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-[8px] font-extrabold text-slate-500 uppercase tracking-wider truncate">Career Growth</div>
+                                <div className="text-[8px] font-extrabold text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">Career Growth</div>
                                 <div className="text-xs font-black text-primary-color truncate">{growthWinner.name}</div>
-                                <div className="text-[9px] font-bold text-purple-400">{(growthWinner.careerGrowth || growthWinner.ratings?.careerGrowth || 0).toFixed(1)} ★</div>
+                                <div className="text-[9px] font-bold text-purple-600 dark:text-purple-400">{(growthWinner.careerGrowth || growthWinner.ratings?.careerGrowth || 0).toFixed(1)} ★</div>
                               </div>
                             </div>
                           )}
                         </div>
 
                         {/* AI Fit Recommendation Engine */}
-                        <div className="mb-4 p-3.5 rounded-xl border border-blue-500/10 bg-blue-500/5">
-                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-                            <Sparkles size={11} className="text-blue-400" /> Dynamic Fit Recommendations
+                        <div className="mb-4 p-3.5 rounded-xl border border-blue-500/20 dark:border-blue-500/10 bg-blue-500/5">
+                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                            <Sparkles size={11} className="text-blue-500 dark:text-blue-400" /> Dynamic Fit Recommendations
                           </h4>
-                          <div className="space-y-2 text-[10px] text-slate-300 font-medium">
+                          <div className="space-y-2 text-[10px] text-secondary-color font-semibold">
                             {wlbWinner && (
                               <div className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1 flex-shrink-0" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-blue-400 mt-1 flex-shrink-0" />
                                 <p>
-                                  For <span className="text-blue-400 font-bold">Balance & Flexibility</span>, prioritize <span className="text-primary-color font-extrabold">{wlbWinner.name}</span>.
+                                  For <span className="text-blue-600 dark:text-blue-400 font-bold">Balance & Flexibility</span>, prioritize <span className="text-primary-color font-black">{wlbWinner.name}</span>.
                                 </p>
                               </div>
                             )}
                             {salaryWinner && (
                               <div className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1 flex-shrink-0" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-1 flex-shrink-0" />
                                 <p>
-                                  For <span className="text-emerald-400 font-bold">Compensation & Perks</span>, prioritize <span className="text-primary-color font-extrabold">{salaryWinner.name}</span>.
+                                  For <span className="text-emerald-600 dark:text-emerald-400 font-bold">Compensation & Perks</span>, prioritize <span className="text-primary-color font-black">{salaryWinner.name}</span>.
                                 </p>
                               </div>
                             )}
                             {growthWinner && (
                               <div className="flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1 flex-shrink-0" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 dark:bg-purple-400 mt-1 flex-shrink-0" />
                                 <p>
-                                  For <span className="text-purple-400 font-bold">Fast-tracked Promotion</span>, prioritize <span className="text-primary-color font-extrabold">{growthWinner.name}</span>.
+                                  For <span className="text-purple-600 dark:text-purple-400 font-bold">Fast-tracked Promotion</span>, prioritize <span className="text-primary-color font-black">{growthWinner.name}</span>.
                                 </p>
                               </div>
                             )}
@@ -685,9 +683,9 @@ export default function ComparePage() {
                         </div>
 
                         {/* Detailed Narrative Insights Box */}
-                        <div className="p-4 rounded-xl border border-purple-500/15 bg-purple-500/5 relative overflow-hidden">
+                        <div className="p-4 rounded-xl border border-purple-500/25 dark:border-purple-500/15 bg-purple-500/5 relative overflow-hidden">
                           <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
-                          <h4 className="text-[9px] font-bold uppercase tracking-widest text-purple-400 mb-1.5">AI Synthesis Narrative</h4>
+                          <h4 className="text-[9px] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-1.5">AI Synthesis Narrative</h4>
                           <p className="text-xs text-secondary-color leading-relaxed font-semibold">
                             {aiVerdict || 'AI Verdict generated based on sentiment overlap and score benchmarking.'}
                           </p>
@@ -749,21 +747,21 @@ export default function ComparePage() {
 
                   {/* Dynamic Metrics Rows */}
                   {METRIC_ROWS.map(row => (
-                    <tr key={row.key} className="border-b hover:bg-white/[0.01]" style={{ borderColor: 'var(--glass-border)' }}>
-                      <td className="py-4 text-xs font-medium text-slate-400">{row.label}</td>
+                    <tr key={row.key} className="border-b hover-bg-theme" style={{ borderColor: 'var(--glass-border)' }}>
+                      <td className="py-4 text-xs font-semibold text-secondary-color">{row.label}</td>
                       {sortedCompanies.map(c => {
                         const score = c[row.key] || c.ratings?.[row.key] || 0;
                         const isWin = getRowWinner(row.key) === c.name;
                         return (
-                          <td key={c.name} className={`py-4 px-4 text-xs font-extrabold ${isWin ? 'text-emerald-400' : 'text-primary-color'}`}>
+                          <td key={c.name} className={`py-4 px-4 text-xs font-black ${isWin ? 'text-emerald-600 dark:text-emerald-400' : 'text-primary-color'}`}>
                             <div className="flex items-center gap-2">
                               <span>{score > 0 ? score.toFixed(1) : 'N/A'}</span>
                               {score > 0 && (
-                                <div className="w-16 h-1 rounded-full overflow-hidden bg-white/5 hidden sm:block">
+                                <div className="w-16 h-1 rounded-full overflow-hidden bg-slate-200 dark:bg-white/5 hidden sm:block">
                                   <div className="h-full rounded-full" style={{ width: `${score * 20}%`, background: isWin ? '#10b981' : row.color }} />
                                 </div>
                               )}
-                              {isWin && <Award size={10} className="text-emerald-400" />}
+                              {isWin && <Award size={10} className="text-emerald-500 dark:text-emerald-400" />}
                             </div>
                           </td>
                         );
@@ -773,15 +771,15 @@ export default function ComparePage() {
 
                   {/* Reviews Summary (Side by side pros and cons) */}
                   <tr className="border-b" style={{ borderColor: 'var(--glass-border)' }}>
-                    <td className="py-4 text-xs font-bold text-slate-400">Workplace Pros</td>
+                    <td className="py-4 text-xs font-bold text-secondary-color">Workplace Pros</td>
                     {sortedCompanies.map(c => {
                       const pros = c.pros || c.topPros || [];
                       return (
-                        <td key={c.name} className="py-4 px-4 text-[10px] text-slate-300 max-w-xs font-semibold">
+                        <td key={c.name} className="py-4 px-4 text-[10px] text-primary-color max-w-xs font-bold">
                           {pros.length > 0 ? (
                             <div className="space-y-1">
                               {pros.slice(0, 2).map((p, idx) => (
-                                <div key={idx} className="flex gap-1 items-start text-emerald-400">
+                                <div key={idx} className="flex gap-1 items-start text-emerald-600 dark:text-emerald-400">
                                   <ThumbsUp size={8} className="mt-0.5 flex-shrink-0" />
                                   <span className="truncate">{p}</span>
                                 </div>
@@ -796,15 +794,15 @@ export default function ComparePage() {
                   </tr>
 
                   <tr className="border-b" style={{ borderColor: 'var(--glass-border)' }}>
-                    <td className="py-4 text-xs font-bold text-slate-400">Workplace Cons</td>
+                    <td className="py-4 text-xs font-bold text-secondary-color">Workplace Cons</td>
                     {sortedCompanies.map(c => {
                       const cons = c.cons || c.topCons || [];
                       return (
-                        <td key={c.name} className="py-4 px-4 text-[10px] text-slate-300 max-w-xs font-semibold">
+                        <td key={c.name} className="py-4 px-4 text-[10px] text-primary-color max-w-xs font-bold">
                           {cons.length > 0 ? (
                             <div className="space-y-1">
                               {cons.slice(0, 2).map((cn, idx) => (
-                                <div key={idx} className="flex gap-1 items-start text-rose-400">
+                                <div key={idx} className="flex gap-1 items-start text-rose-600 dark:text-rose-400">
                                   <ThumbsDown size={8} className="mt-0.5 flex-shrink-0" />
                                   <span className="truncate">{cn}</span>
                                 </div>
@@ -819,9 +817,9 @@ export default function ComparePage() {
                   </tr>
 
                   <tr className="border-b" style={{ borderColor: 'var(--glass-border)' }}>
-                    <td className="py-4 text-xs font-medium text-slate-400">Location</td>
+                    <td className="py-4 text-xs font-semibold text-secondary-color">Location</td>
                     {sortedCompanies.map(c => (
-                      <td key={c.name} className="py-4 px-4 text-[10px] font-semibold text-slate-300">
+                      <td key={c.name} className="py-4 px-4 text-[10px] font-bold text-primary-color">
                         {typeof c.location === 'object'
                           ? `${c.location.city || ''}, ${c.location.country || ''}`
                           : (c.location || 'Global')}
@@ -829,15 +827,15 @@ export default function ComparePage() {
                     ))}
                   </tr>
                   <tr className="border-b" style={{ borderColor: 'var(--glass-border)' }}>
-                    <td className="py-4 text-xs font-medium text-slate-400">Company Size</td>
+                    <td className="py-4 text-xs font-semibold text-secondary-color">Company Size</td>
                     {sortedCompanies.map(c => (
-                      <td key={c.name} className="py-4 px-4 text-[10px] font-semibold text-slate-300">{c.size || 'N/A'}</td>
+                      <td key={c.name} className="py-4 px-4 text-[10px] font-bold text-primary-color">{c.size || 'N/A'}</td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-4 text-xs font-medium text-slate-400">Total Reviews Logs</td>
+                    <td className="py-4 text-xs font-semibold text-secondary-color">Total Reviews Logs</td>
                     {sortedCompanies.map(c => (
-                      <td key={c.name} className="py-4 px-4 text-[10px] font-bold text-slate-300">
+                      <td key={c.name} className="py-4 px-4 text-[10px] font-extrabold text-primary-color">
                         {((c.totalReviews || c.reviewCount || 0)).toLocaleString()}
                       </td>
                     ))}

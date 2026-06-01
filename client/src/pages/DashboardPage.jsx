@@ -12,6 +12,7 @@ import Footer from '../components/Footer';
 import SentimentChart from '../components/charts/SentimentChart';
 import PlatformBarChart from '../components/charts/PlatformBarChart';
 import RatingDistributionChart from '../components/charts/RatingDistributionChart';
+import CompanyLogo from '../components/CompanyLogo';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -32,7 +33,7 @@ function TrustGauge({ score }) {
       <div className="relative w-36 h-36">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 140 140">
           <circle cx="70" cy="70" r={radius} fill="none"
-            stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+            stroke="var(--border-color)" strokeWidth="10" />
           <motion.circle
             cx="70" cy="70" r={radius} fill="none"
             stroke={color} strokeWidth="10"
@@ -61,7 +62,7 @@ function MetricBar({ label, value, maxValue = 5, color = '#3b82f6' }) {
   return (
     <div className="flex items-center gap-3">
       <span className="text-xs text-secondary-color w-28 font-medium">{label}</span>
-      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border-color)' }}>
         <motion.div
           className="h-full rounded-full"
           style={{ background: color }}
@@ -239,7 +240,7 @@ function DashboardSearch({ onSearch }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             className="absolute top-full left-0 right-0 mt-2 glass-card-static border rounded-xl overflow-hidden z-50 shadow-2xl"
-            style={{ borderColor: 'var(--glass-border)', background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)' }}
+            style={{ borderColor: 'var(--glass-border)', background: 'var(--glass-bg)', backdropFilter: 'blur(16px)' }}
           >
             {isSearching && suggestions.length === 0 ? (
               <div className="p-4 text-xs text-slate-400 flex items-center gap-2">
@@ -248,20 +249,20 @@ function DashboardSearch({ onSearch }) {
               </div>
             ) : (
               <div className="p-2 max-h-64 overflow-y-auto">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-3 py-1.5">Suggestions</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest text-secondary-color px-3 py-1.5">Suggestions</div>
                 {suggestions.map((s, idx) => {
                   const hasError = imageErrors[s.domain];
                   return (
                     <button
                       key={`${s.domain}-${idx}`}
                       onClick={() => handleSelect(s.name)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/5 transition-all text-left group"
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover-bg-theme transition-all text-left group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="w-7 h-7 rounded bg-secondary-color border border-theme flex items-center justify-center overflow-hidden flex-shrink-0">
                           {s.logo && !hasError ? (
                             <img
-                              src={s.logo}
+                              src={s.logo && s.logo.includes('clearbit.com') ? `https://logos.hunter.io/${s.domain}` : s.logo}
                               alt={s.name}
                               className="w-5 h-5 object-contain"
                               onError={() => setImageErrors(prev => ({ ...prev, [s.domain]: true }))}
@@ -274,7 +275,7 @@ function DashboardSearch({ onSearch }) {
                           <div className="text-sm text-primary-color font-semibold group-hover:text-blue-400 transition-colors">
                             {s.name}
                           </div>
-                          <div className="text-[10px] text-slate-500">
+                          <div className="text-[10px] text-secondary-color">
                             {s.domain}
                           </div>
                         </div>
@@ -422,9 +423,7 @@ export default function DashboardPage() {
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div className="flex items-start gap-5">
                   {/* Logo */}
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-2xl font-black text-white flex-shrink-0">
-                    {company.name[0]}
-                  </div>
+                  <CompanyLogo company={company} size="lg" />
                   <div>
                     <div className="flex items-center gap-3 flex-wrap mb-1">
                       <h1 className="text-2xl md:text-3xl font-black text-primary-color">{company.name}</h1>
@@ -607,8 +606,7 @@ export default function DashboardPage() {
 
                   {/* Sort */}
                   <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-                    className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}>
+                    className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer border border-theme bg-secondary-color text-secondary-color">
                     <option value="date_desc">Newest</option>
                     <option value="date_asc">Oldest</option>
                     <option value="rating_desc">Highest Rating</option>

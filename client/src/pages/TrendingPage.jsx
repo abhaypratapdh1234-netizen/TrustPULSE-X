@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus, Star, ArrowRight, Filter, AlertTriangle, Award, Zap, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import CompanyLogo from '../components/CompanyLogo';
 import { useApp } from '../context/AppContext';
 
 const INDUSTRIES = ['All', 'Technology', 'Finance', 'Healthcare', 'E-Commerce', 'Automotive', 'IT Services', 'Fintech', 'Social Media'];
@@ -68,9 +69,7 @@ function TrendingCard({ company, rank, delay }) {
         </div>
 
         {/* Logo */}
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex items-center justify-center text-base font-black text-white flex-shrink-0">
-          {company.name ? company.name[0] : '?'}
-        </div>
+        <CompanyLogo company={company} size="md" />
 
         {/* Info */}
         <div className="min-w-0">
@@ -138,9 +137,7 @@ function TopRatedCard({ company, rank, delay }) {
         </div>
 
         {/* Logo */}
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center text-base font-black text-white flex-shrink-0">
-          {company.name ? company.name[0] : '?'}
-        </div>
+        <CompanyLogo company={company} size="md" />
 
         {/* Info */}
         <div className="min-w-0">
@@ -201,9 +198,7 @@ function LowestRatedCard({ company, rank, delay }) {
           </div>
 
           {/* Logo */}
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/20 to-rose-500/20 border border-red-500/20 flex items-center justify-center text-base font-black text-white flex-shrink-0">
-            {company.name ? company.name[0] : '?'}
-          </div>
+          <CompanyLogo company={company} size="md" />
 
           {/* Info */}
           <div className="min-w-0">
@@ -388,7 +383,7 @@ export default function TrendingPage() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'trending'
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                : 'text-secondary-color hover:text-primary-color hover-bg-theme'
             }`}
           >
             <Zap size={14} />
@@ -399,7 +394,7 @@ export default function TrendingPage() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'top'
                 ? 'bg-emerald-600 text-white shadow-lg'
-                : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                : 'text-secondary-color hover:text-primary-color hover-bg-theme'
             }`}
           >
             <Award size={14} />
@@ -410,7 +405,7 @@ export default function TrendingPage() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'lowest'
                 ? 'bg-red-600 text-white shadow-lg'
-                : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                : 'text-secondary-color hover:text-primary-color hover-bg-theme'
             }`}
           >
             <AlertTriangle size={14} />
@@ -421,7 +416,7 @@ export default function TrendingPage() {
         {/* Filters */}
         <div className="glass-card-static border rounded-2xl p-4 mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
           style={{ borderColor: 'var(--glass-border)' }}>
-          <Filter size={16} className="text-slate-400 flex-shrink-0" />
+          <Filter size={16} className="text-secondary-color flex-shrink-0" />
 
           {/* Industry Filter (only relevant if not looking at general lowest-rated) */}
           <div className="flex gap-2 flex-wrap">
@@ -436,7 +431,7 @@ export default function TrendingPage() {
                       : activeTab === 'lowest'
                         ? 'bg-red-600 text-white'
                         : 'bg-blue-600 text-white'
-                    : 'text-secondary-color hover:text-primary-color hover:bg-white/5'
+                    : 'text-secondary-color hover:text-primary-color hover-bg-theme'
                 }`}
               >
                 {ind}
@@ -448,8 +443,7 @@ export default function TrendingPage() {
             <select
               value={sort}
               onChange={e => setSort(e.target.value)}
-              className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}
+              className="text-xs font-semibold px-3 py-2 rounded-lg outline-none cursor-pointer border border-theme bg-secondary-color text-secondary-color"
             >
               {activeTab === 'trending' && <option value="trending">Sort by Growth</option>}
               <option value="rating">Sort by Rating</option>

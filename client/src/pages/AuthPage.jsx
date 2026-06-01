@@ -30,7 +30,7 @@ function PasswordStrength({ password }) {
       <div className="flex gap-1 mb-1">
         {[1, 2, 3, 4].map(i => (
           <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
-            style={{ background: i <= strength ? colors[strength] : 'rgba(255,255,255,0.1)' }} />
+            style={{ background: i <= strength ? colors[strength] : 'var(--border-color)' }} />
         ))}
       </div>
       <p className="text-xs font-medium" style={{ color: colors[strength] }}>
@@ -237,8 +237,7 @@ export default function AuthPage() {
 
               {/* Tab Toggle (Only show if NOT in forgot password mode) */}
               {!isForgot && (
-                <div className="flex p-1 rounded-xl mb-8"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--glass-border)' }}>
+                <div className="flex p-1 rounded-xl mb-8 border border-theme bg-secondary-color">
                   {['Sign In', 'Sign Up'].map((label, i) => (
                     <button
                       key={label}
@@ -246,7 +245,7 @@ export default function AuthPage() {
                       className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                         (i === 0) === isLogin
                           ? 'bg-blue-600 text-white shadow-sm'
-                          : 'text-secondary-color hover:text-primary-color'
+                          : 'text-secondary-color hover:text-primary-color hover-bg-theme'
                       }`}
                     >
                       {label}
@@ -405,7 +404,7 @@ export default function AuthPage() {
               <div className="mt-6">
                 <div className="flex items-center gap-3 my-5">
                   <div className="flex-1 h-px" style={{ background: 'var(--glass-border)' }} />
-                  <span className="text-xs text-slate-500 font-medium">or continue with</span>
+                  <span className="text-xs text-secondary-color font-medium">or continue with</span>
                   <div className="flex-1 h-px" style={{ background: 'var(--glass-border)' }} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -423,12 +422,12 @@ export default function AuthPage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-center text-xs text-slate-500 mt-3">Social login — coming soon</p>
+                <p className="text-center text-xs text-secondary-color mt-3">Social login — coming soon</p>
               </div>
             </div>
           </motion.div>
 
-          <p className="text-center text-xs text-slate-600 mt-6">
+          <p className="text-center text-xs text-secondary-color mt-6">
             By continuing, you agree to our{' '}
             <Link to="/" className="text-blue-400 hover:underline">Terms of Service</Link>
             {' '}and{' '}

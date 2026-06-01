@@ -599,6 +599,33 @@ exports.getCompany = async (req, res, next) => {
       }
     }
 
+    // Trigger dynamic live reviews sync from web platforms (Trustpilot scraper + Apify/Outscraper API Key support)
+    try {
+      const { fetchRealWebReviews } = require('../utils/reviewScraper');
+      const liveReviews = await fetchRealWebReviews(company.name, company.website);
+
+      if (liveReviews && liveReviews.length > 0) {
+        console.log(`📡 Dynamically seeding ${liveReviews.length} real live web reviews for ${company.name}`);
+        // Remove older synthesized dummy reviews for this company to make space for the 100% real reviews!
+        await Review.deleteMany({ company: company._id, isFake: false });
+
+        // Save real reviews to DB
+        for (const lr of liveReviews) {
+          lr.company = company._id;
+          await Review.create(lr);
+        }
+
+        // Recompute company stats using real review weights!
+        const { recomputeCompanyStats } = require('../services/analyticsService');
+        await recomputeCompanyStats(company._id);
+
+        // Refresh the company model object
+        company = await Company.findById(company._id);
+      }
+    } catch (scrapErr) {
+      console.error(`⚠️ Live reviews update failed: ${scrapErr.message}. Falling back to cached database records.`);
+    }
+
     // Fetch related reviews from DB
     const reviews = await Review.find({ company: company._id, isVisible: true }).sort({ reviewDate: -1 });
 

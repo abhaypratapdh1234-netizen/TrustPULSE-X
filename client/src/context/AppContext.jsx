@@ -9,7 +9,9 @@ export const AppProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   // Theme
-  const [theme, setTheme] = useState(() => localStorage.getItem('tp_theme') || 'dark');
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('tp_theme') || localStorage.getItem('trustpulse-theme') || 'dark'
+  );
 
   // Company state
   const [company, setCompany] = useState(null);
@@ -40,10 +42,16 @@ export const AppProvider = ({ children }) => {
     try { return JSON.parse(localStorage.getItem('tp_history') || '[]'); } catch { return []; }
   });
 
-  // Apply theme
+  // Apply theme — also sync the Tailwind `dark` class so dark: variants work correctly
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('tp_theme', theme);
+    localStorage.setItem('trustpulse-theme', theme); // keep both keys in sync
   }, [theme]);
 
   // Fetch watchlist when authenticated

@@ -16,6 +16,7 @@
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^11.2.12",
+    "hls.js": "^1.6.16",
     "jspdf": "^2.5.1",
     "lucide-react": "^0.396.0",
     "react": "^19.2.6",

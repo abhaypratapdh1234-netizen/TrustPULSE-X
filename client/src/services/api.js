@@ -35,6 +35,7 @@ export const authAPI = {
   updatePreferences: (prefs) => api.put('/auth/preferences', prefs),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post(`/auth/reset-password/${token}`, { password }),
+  updatePassword: (data) => api.put('/auth/update-password', data),
 };
 
 // ─── Users ───────────────────────────────────────────────────
